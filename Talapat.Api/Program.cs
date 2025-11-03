@@ -1,7 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Talabat.Core.IRepositories;
 using Talapat.Repository.Data;
+using Talapat.Repository.Repositories;
 
 namespace Talapat.Api
 {
@@ -15,10 +17,11 @@ namespace Talapat.Api
             // Add services to the Dependence Injection container.
 
             webApplicationBuilder.Services.AddControllers();
+            webApplicationBuilder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             // register required api services to DI Container
             webApplicationBuilder.Services.AddDbContext<TalabatDbContext>(options =>
             {
-                options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseLazyLoadingProxies().UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
