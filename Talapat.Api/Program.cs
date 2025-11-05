@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Talabat.Core.IRepositories;
+using Talapat.Api.Helpers;
 using Talapat.Repository.Data;
 using Talapat.Repository.Repositories;
 
@@ -18,12 +19,16 @@ namespace Talapat.Api
 
             webApplicationBuilder.Services.AddControllers();
             webApplicationBuilder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            webApplicationBuilder.Services.AddAutoMapper(Mapper => Mapper.AddProfile(typeof(MappingProfiles)));
+            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            webApplicationBuilder.Services.AddTransient<ProductPictureURLResolver>();
             // register required api services to DI Container
+
             webApplicationBuilder.Services.AddDbContext<TalabatDbContext>(options =>
             {
                 options.UseLazyLoadingProxies().UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
+            
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             webApplicationBuilder.Services.AddEndpointsApiExplorer();
             webApplicationBuilder.Services.AddSwaggerGen(); 
@@ -61,6 +66,7 @@ namespace Talapat.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseStaticFiles();
 
 
             app.MapControllers(); 
