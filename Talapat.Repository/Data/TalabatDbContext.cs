@@ -11,7 +11,7 @@ namespace Talapat.Repository.Data
 {
     public class TalabatDbContext : DbContext
     {
-        public TalabatDbContext(DbContextOptions<TalabatDbContext> options) : base(options){}
+        public TalabatDbContext(DbContextOptions<TalabatDbContext> options) : base(options){ }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
