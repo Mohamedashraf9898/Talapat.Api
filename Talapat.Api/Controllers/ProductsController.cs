@@ -13,20 +13,28 @@ namespace Talapat.Api.Controllers
     public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<Product> _productRepo;
+        private readonly IGenericRepository<ProductBrand> _brandsRepo;
+        private readonly IGenericRepository<ProductCategory> _categoriesRepo;
         private readonly IMapper _mapper;
 
-        public ProductsController(IGenericRepository<Product> productRepo , IMapper mapper)
+        public ProductsController(
+            IGenericRepository<Product> productRepo ,
+            IGenericRepository<ProductBrand> brandsRepo,
+            IGenericRepository<ProductCategory> categoriesRepo,
+            IMapper mapper)
         {
             _productRepo = productRepo;
+            _brandsRepo = brandsRepo;
+            _categoriesRepo = categoriesRepo;
             _mapper = mapper;
         }
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<ProductDTO>>> GetProducts()
         {
             var spec = new BaseSpecifications<Product>();
             var products = await _productRepo.GetAllWithSpecAsync(spec);
-            var dto = _mapper.Map<IEnumerable<ProductDTO>>(products);
+            var dto = _mapper.Map<IReadOnlyList<ProductDTO>>(products);
             return Ok(dto);
         }
         [ProducesResponseType(typeof(ProductDTO), StatusCodes.Status200OK)]
@@ -41,5 +49,21 @@ namespace Talapat.Api.Controllers
             var dto = _mapper.Map<ProductDTO>(product);
             return Ok(dto);
         }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+        {
+            var brands = await _brandsRepo.GetAllAsync();
+            return Ok(brands);
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<IReadOnlyList<ProductCategory>>> GetProductCategories()
+        {
+            var categories = await _categoriesRepo.GetAllAsync();
+            return Ok(categories);
+        }
+
+
     } 
 }
