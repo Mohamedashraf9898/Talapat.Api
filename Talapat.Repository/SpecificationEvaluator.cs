@@ -16,7 +16,12 @@ namespace Talapat.Repository
 
             if(spec.Criteria is not null) // E=>E.ID==1
                 query = query.Where(spec.Criteria);
-            return query;
+            if(spec.OrderBy is not null)
+                query = query.OrderBy(spec.OrderBy);
+           else if (spec.OrderByDesc is not null)
+                query = query.OrderByDescending(spec.OrderByDesc);
+            
+                return query;
         }
     }
 }

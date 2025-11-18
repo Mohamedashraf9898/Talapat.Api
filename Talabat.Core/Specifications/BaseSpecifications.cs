@@ -11,6 +11,9 @@ namespace Talabat.Core.Specifications
     public class BaseSpecifications<T> : ISpecifications<T> where T : BaseEntity
     {
         public Expression<Func<T, bool>> Criteria { get; set; } = null;
+        public Expression<Func<T, object>> OrderBy { get; set; } = null; // ByDefault = null
+        public Expression<Func<T, object>> OrderByDesc { get; set; } = null;
+
         public BaseSpecifications()
         {
             
@@ -18,6 +21,14 @@ namespace Talabat.Core.Specifications
         public BaseSpecifications(Expression<Func<T, bool>> criteriaExpression)
         {
             Criteria= criteriaExpression;
+        }
+        public void AddOrderBy(Expression<Func<T, object>> orderByExpression)
+        {
+            OrderBy= orderByExpression;
+        }
+        public void AddOrderByDesc(Expression<Func<T, object>> orderByDescExpression)
+        {
+            OrderByDesc= orderByDescExpression;
         }
     }
 }
