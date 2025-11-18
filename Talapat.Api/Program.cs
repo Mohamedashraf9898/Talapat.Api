@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Talabat.Core.IRepositories;
 using Talapat.Api.Helpers;
+using Talapat.Api.Middlewares;
 using Talapat.Repository.Data;
 using Talapat.Repository.Repositories;
 
@@ -44,11 +45,11 @@ namespace Talapat.Api
                     var errorResponse = new Errors.ApiValidationErrorResponse
                     {
                         Errors = errors
-                    };
+                    }; 
                     return new BadRequestObjectResult(errorResponse);
                 };
             });
-            #endregion
+             #endregion
 
             var app = webApplicationBuilder.Build();
              using var scope = app.Services.CreateScope();
@@ -72,6 +73,7 @@ namespace Talapat.Api
             #region Configure Kesteral Middelwares
 
             // Configure the HTTP request pipeline.
+            app.UseMiddleware<ExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {
