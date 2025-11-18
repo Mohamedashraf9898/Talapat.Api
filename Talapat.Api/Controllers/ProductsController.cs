@@ -20,6 +20,7 @@ namespace Talapat.Api.Controllers
             _productRepo = productRepo;
             _mapper = mapper;
         }
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
@@ -28,6 +29,8 @@ namespace Talapat.Api.Controllers
             var dto = _mapper.Map<IEnumerable<ProductDTO>>(products);
             return Ok(dto);
         }
+        [ProducesResponseType(typeof(ProductDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Talabat.Core.IRepositories;
+using Talapat.Api.Extensions;
 using Talapat.Api.Helpers;
 using Talapat.Api.Middlewares;
 using Talapat.Repository.Data;
@@ -20,36 +21,17 @@ namespace Talapat.Api
             // Add services to the Dependence Injection container.
 
             webApplicationBuilder.Services.AddControllers();
-            webApplicationBuilder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            webApplicationBuilder.Services.AddAutoMapper(Mapper => Mapper.AddProfile(typeof(MappingProfiles)));
-            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
-            webApplicationBuilder.Services.AddTransient<ProductPictureURLResolver>();
-            // register required api services to DI Container
+            webApplicationBuilder.Services.AddSwaggerServices();
 
+
+            webApplicationBuilder.Services.AddTransient<ProductPictureURLResolver>();
             webApplicationBuilder.Services.AddDbContext<TalabatDbContext>(options =>
             {
                 options.UseLazyLoadingProxies().UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
             });
-            
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            webApplicationBuilder.Services.AddEndpointsApiExplorer();
-            webApplicationBuilder.Services.AddSwaggerGen(); 
-            webApplicationBuilder.Services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = actionContext =>
-                {
-                    var errors = actionContext.ModelState
-                    .Where(e => e.Value.Errors.Count > 0)
-                    .SelectMany(x => x.Value.Errors)
-                    .Select(x => x.ErrorMessage).ToArray();
-                    var errorResponse = new Errors.ApiValidationErrorResponse
-                    {
-                        Errors = errors
-                    }; 
-                    return new BadRequestObjectResult(errorResponse);
-                };
-            });
-             #endregion
+
+            webApplicationBuilder.Services.AddApplicationServices();
+            #endregion
 
             var app = webApplicationBuilder.Build();
              using var scope = app.Services.CreateScope();
@@ -74,12 +56,12 @@ namespace Talapat.Api
 
             // Configure the HTTP request pipeline.
             app.UseMiddleware<ExceptionMiddleware>();
-
-            if (app.Environment.IsDevelopment())
+            // Configure the HTTP request pipeline.if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddlewares();
             }
+            
+            app.UseStatusCodePagesWithRedirects("/errors/{0}");
 
             app.UseHttpsRedirection();
 
