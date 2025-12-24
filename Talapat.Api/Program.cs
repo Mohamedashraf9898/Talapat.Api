@@ -6,6 +6,7 @@ using Talabat.Core.IRepositories;
 using Talapat.Api.Extensions;
 using Talapat.Api.Helpers;
 using Talapat.Api.Middlewares;
+using Talapat.Repository._Identity;
 using Talapat.Repository.Data;
 using Talapat.Repository.Repositories;
 
@@ -29,6 +30,10 @@ namespace Talapat.Api
             {
                 options.UseLazyLoadingProxies().UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            webApplicationBuilder.Services.AddDbContext<TalabatIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
+            });
 
             webApplicationBuilder.Services.AddApplicationServices();
             #endregion
@@ -38,12 +43,14 @@ namespace Talapat.Api
 
             var service = scope.ServiceProvider;
             var _dbContext = service.GetRequiredService<TalabatDbContext>();
+            var _idenityDbContext = service.GetRequiredService<TalabatIdentityDbContext>();
             var loggerFactory = service.GetRequiredService<ILoggerFactory>();
 
             try
             {
                 await _dbContext.Database.MigrateAsync();
                 await TalabatDbContextSeed.SeedAsync(_dbContext);
+                await _idenityDbContext.Database.MigrateAsync();
 
             }
             catch (Exception ex)
