@@ -1,12 +1,16 @@
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Talabat.Core.Entities.Identity;
 using Talabat.Core.IRepositories;
 using Talapat.Api.Extensions;
 using Talapat.Api.Helpers;
 using Talapat.Api.Middlewares;
 using Talapat.Repository._Identity;
+using Talapat.Repository._Identity.DataSeed;
 using Talapat.Repository.Data;
 using Talapat.Repository.Repositories;
 
@@ -34,6 +38,8 @@ namespace Talapat.Api
             {
                 options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("IdentityConnection"));
             });
+            webApplicationBuilder.Services.AddIdentity<ApplicationUser,IdentityRole>()
+                .AddEntityFrameworkStores<TalabatIdentityDbContext>();   
 
             webApplicationBuilder.Services.AddApplicationServices();
             #endregion
@@ -51,6 +57,8 @@ namespace Talapat.Api
                 await _dbContext.Database.MigrateAsync();
                 await TalabatDbContextSeed.SeedAsync(_dbContext);
                 await _idenityDbContext.Database.MigrateAsync();
+                var _userManager = service.GetRequiredService<UserManager<ApplicationUser>>();
+                await ApplicationIdentityContextSeed.SeedUsersAsync(_userManager);
 
             }
             catch (Exception ex)
